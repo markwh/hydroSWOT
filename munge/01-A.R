@@ -40,6 +40,9 @@ bhats %>%
   plot()
 
 # Where do these come from?
+trimb <- filter(bhats, bhat > 0, bhat < 1)
+meanb <- mean(trimb$bhat)
+varb <- var(trimb$bhat)
 
 blocs <- hswot %>% 
   transmute(lat = dec_lat_va,
