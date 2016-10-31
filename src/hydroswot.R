@@ -61,6 +61,8 @@ blocs %>%
 
 # distribution of AHG errors
 
+
+
 # distribution of Ao as function of Wo, H'(Wo) 
 
 

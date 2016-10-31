@@ -37,7 +37,7 @@ bhats %>%
   `[[`("bhat") %>% 
   # hist() %>%
   density() %>% 
-  plot()
+  plot(xlim = c(0, 1))
 
 # Where do these come from?
 trimb <- filter(bhats, bhat > 0, bhat < 1)
@@ -48,19 +48,57 @@ blocs <- hswot %>%
   transmute(lat = dec_lat_va,
             lon = dec_long_va,
             xs = site_no) %>% 
-  left_join(bhats, by = "xs")
+  unique() %>% 
+  left_join(bhats, by = "xs") %>% 
+  filter(!is.na(n))
 
 library(leaflet)
 
 blocs %>% 
-  sample_n(40) %>% 
+  sample_n(400) %>% 
   leaflet() %>% 
   addTiles() %>% 
-  addCircleMarkers(lng = ~lon, lat = ~lat, radius = ~n * 10 / mean(n))
+  addCircleMarkers(lng = ~lon, lat = ~lat, radius = ~log(n))
+dim(blocs)
+summary(blocs)
 
 # distribution of AHG errors
+ahgMods <- bdata %>% 
+  group_by(xsname)
+
 
 # distribution of Ao as function of Wo, H'(Wo) 
+ahgMods <- bdata %>% 
+  group_by(xsname, xs) %>%
+  mutate(n = n()) %>% 
+  ungroup() %>% 
+  dplyr::filter(n > 10) %>%
+  split(f = .$xs) %>% 
+  lapply(lm, formula = logW ~ logQ)
+
+ahgMods.a <- lapply(ahgMods, augment) %>% 
+  bind_rows(.id = "station") %>% 
+  mutate(Q = exp(logQ), W = exp(logW), 
+         What = exp(.hat),
+         Wresid = W - What)
 
 
 
+
+ahgMods.t <- lapply(ahgMods, tidy) %>% 
+  bind_rows(.id = "station") %>% 
+  select(station, term, estimate) %>%
+  spread(key = term, value = estimate) %>% 
+  setNames(station, a, b)
+  tbl_df()
+
+# Get standard deviation
+dim(ahgMods.a)
+hist(ahgMods.a$.resid, xlim = c(-1, 1), breaks = 200)
+car::qqPlot(ahgMods.a$.resid) # heavy tails
+qqplot(qcauchy(ppoints(500)), ahgMods.a$.resid)
+
+## Summary
+ahgMods.sum <- ahgMods.a %>% 
+  group_by(station) %>% 
+  summarize(sdLogW = sd(.resid))

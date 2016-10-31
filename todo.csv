@@ -1,0 +1,8 @@
+"itemText","timeCreated","status","timeCompleted","isCompleted","itemID","comment"
+"set up project",2016-10-30 20:33:35,"incomplete",NA,FALSE,1,""
+"make github repo",2016-10-30 20:46:41,"incomplete",NA,FALSE,2,""
+"get prior on b",2016-10-30 20:47:17,"incomplete",NA,FALSE,3,""
+"get distribution of AHG errors",2016-10-30 20:54:11,"incomplete",NA,FALSE,4,""
+"munge data into nice format",2016-10-30 20:55:01,"incomplete",NA,FALSE,5,""
+"convert hydroswot results to prior params",2016-10-31 13:35:17,"incomplete",NA,FALSE,6,""
+"put hydroswot stuff into the model",2016-10-31 13:37:49,"incomplete",NA,FALSE,7,""
