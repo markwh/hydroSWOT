@@ -3,15 +3,10 @@
 # 10/20/2016
 # Working with HYDRoSWOT dataset described by Bjerklie
 
-library(markstats)
-
 hswot <- read.csv("data/hydroswot/SWOT_ADCP_Dataset.txt", sep = "\t")
 fieldref <- read.csv("data/hydroswot/FieldDefinitions.txt", sep = "\t")
 fr <- function(field)
   dplyr::filter(fieldref, grepl(field, Field))
-
-lapply(fieldred)
-glimpse(hswot)
 
 swotcols <- c("dec_lat_va", "dec_long_va", "drain_area_va", 
               "contrib_drain_area_va", "alt_va", "alt_datum_cd",
