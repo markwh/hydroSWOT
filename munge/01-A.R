@@ -12,4 +12,3 @@ swotcols <- c("dec_lat_va", "dec_long_va", "drain_area_va",
 
 unkcols <- c("q_meas_no", "q_va", "stag_va", "stage_diff_va", "stage_diff_du",
              "mean_idx_vel_va", "std_second_area_va")
-
