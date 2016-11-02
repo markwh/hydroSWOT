@@ -1,6 +1,10 @@
 # Reading in data
 
-hswot <- read.csv("data/SWOT_ADCP_Dataset.txt", sep = "\t")
+hswot <- read.csv("data/SWOT_ADCP_Dataset.txt", sep = "\t") %>% 
+  group_by(q_meas_td) %>% 
+  mutate(datetime = mdy_hms(q_meas_dt, tz = q_meas_td[1])) %>% 
+  ungroup()
+
 fieldref <- read.csv("data/FieldDefinitions.txt", sep = "\t")
 fr <- function(field)
   dplyr::filter(fieldref, grepl(field, Field))

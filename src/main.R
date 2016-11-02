@@ -5,5 +5,5 @@
 library(ProjectTemplate)
 load.project()
 
-# To populate the data/ folder:
-source("src/pullData.R")
+# # To populate the data/ folder:
+# source("src/pullData.R")
