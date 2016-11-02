@@ -1,0 +1,214 @@
+---
+title: "hydroSWOT anomalies"
+author: "Mark Hagemann"
+date: "November 2, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+When trying to use the hydroSWOT database to predict Ao using SWOT-available measurements, I ran into some strange behavior in some of the stations' stage height data. Here's stage vs. time for the Seneca River at Seneca Falls:
+
+```{r}
+plothw(4232730)
+```
+
+Clearly there's some change in datum going on. Digging deeper, I calculated the range in reported stage for each station. Here are the 40 stations with the largest ranges.
+
+```{r}
+
+hswot %>% 
+  group_by(site_no) %>% 
+  summarize(hrange = max(stage_va) - min(stage_va), n = n()) %>% 
+  arrange(desc(hrange)) %>% 
+  print(n = 40) %>% 
+  kable()
+```
+
+The worst has a range of over 90000 feet! Here's that one. 
+
+```{r}
+plothw(4240503)
+```
+
+I'll chalk that up to a data entry error. Here's what it looks like without that value:
+
+```{r}
+plothw(4240503, ylim = c(0, 500))
+```
+
+Still has an apparent change in datum, so removing the obvious outliler did not result in a reliable dataset.
+
+Clearly the worst offenders according to the above table need to be fixed, but this detection approach using the range breaks down further down the list. Consider rows 34 and 35 in the table.
+
+```{r}
+plothw(7288800)
+plothw(9529300)
+```
+
+Both have about the same range in reported stage, but only one is obviously problematic. Something more sophisticated has to be applied, but with over 10000 stations' data to look at, it needs to be an automated process.
+
+### The solution
+
+I'm trying an R package produced by Twitter called [BreakoutDetection](https://github.com/twitter/BreakoutDetection). 
+
+```{r}
+devtools::install_github("twitter/BreakoutDetection")
+library(BreakoutDetection)
+
+breakout(filter(hswot, site_no == 9529300)$stage_va, 
+         method = "amoc", plot = TRUE, nperm = 500)
+breakout(filter(hswot, site_no == 7288800)$stage_va, 
+         method = "amoc", plot = TRUE, nperm = 500)
+```
+
+Apply this to every station
+
+```{r}
+
+brstat <- function(x, nperm = 500, ...) {
+  br <- breakout(x, nperm = nperm, ...)
+  out <- br$stat
+  out
+}
+
+bstats <- hswot %>%
+  filter(!is.na(stage_va)) %>% 
+  group_by(site_no, station_nm) %>% 
+  mutate(n = n()) %>% 
+  arrange(datetime) %>% 
+  ungroup() %>% 
+  filter(n > 20) %>% 
+  group_by(site_no, station_nm) %>% 
+  summarize(brstat = brstat(stage_va)) %>% 
+  ungroup() %>% 
+  mutate(site_no = as.character(site_no))
+
+head(bstats)
+
+summary(bstats$brstat)
+
+```
+
+I don't know what test statistic this uses for detecting change points, but here is the result arranged descending by this value.
+
+```{r}
+
+bstats %>% 
+  ungroup() %>% 
+  mutate(site_no = as.character(site_no)) %>% 
+  arrange(desc(brstat)) %>% 
+  head(40) %>% 
+  kable()
+```
+
+The one with the largest statistic looks like this:
+
+```{r}
+plothw(11313433)
+```
+
+I agree that this looks anomalous, and for more than just having a breakpoint. Note that it has a relatively small stage range, and the initial detection method wouldn't have been much help here. 
+
+Here's the second-worst by the above table.
+
+```{r}
+plothw(arrange(bstats, desc(brstat))$site_no[i])
+
+i <- i + 1
+
+```
+
+Going through these, some don't actually look bad. Number 26 for example (St. Francis River at Wappapello, MO) has a statistic of 16.16. This apparently because of the high-frequency sampling during a high-flow event. 
+
+
+I should check on these high-frequency parts. Here's Harney River near Flamingo FL:
+
+```{r}
+hs1 <- hswot %>% 
+  filter(site_no == 252551081050900,
+         datetime < "2005-01-01") %>% 
+   transmute(datetime = datetime,
+             q_m3s = q_va * 0.028317,
+            w_m = stream_wdth_va / 3.28084,
+            logQ = log(q_m3s),
+            logW = log(w_m),
+            h = stage_va,
+            xs = site_no, 
+            xsname = station_nm)
+hs1 %>% print(n = 29)
+
+plot(h ~ datetime, hs1)
+plot(q_m3s ~ h, hs1)
+```
+
+
+### Another method
+
+I'm not thrilled with the breakpoint function, although it might work as a last resort.
+
+Trying now the changepoint package.
+
+```{r}
+install.packages("changepoint")
+library(changepoint)
+?cpt.mean
+
+cpt.mean(hs1$h)
+```
+
+
+```{r}
+hs2 <- hswot %>% 
+  filter(site_no == 11313433) %>% 
+   transmute(datetime = datetime,
+             q_m3s = q_va * 0.028317,
+            w_m = stream_wdth_va / 3.28084,
+            logQ = log(q_m3s),
+            logW = log(w_m),
+            h = stage_va,
+            xs = site_no, 
+            xsname = station_nm)
+cpt1 <- cpt.mean(hs2$h, class = FALSE)
+
+cpt1
+
+cpt2 <- cpt.mean(na.omit(hs2$h), method = "BinSeg", Q = 1)
+
+plothw(11313433)
+```
+
+Computing these like I did with the breakpoints package.
+
+```{r}
+
+cpstat <- function(x, ...) {
+  cp <- cpt.mean(x, method = "BinSeg", Q = 1, ...)
+  out <- cp@pen.value.full
+  out
+}
+
+cstats <- xsdat %>%
+  filter(n > 20) %>% 
+  group_by(xs, xsname) %>% 
+  summarize(cpstat = cpstat(h_m)) %>% 
+  ungroup() %>% 
+  mutate(xs = as.character(xs)) %>% 
+  arrange(desc(cpstat))
+
+head(cstats)
+
+summary(bstats$brstat)
+
+```
+
+```{r}
+plothw(cstats$xs[i])
+
+i <- i + 1
+
+```
+
+

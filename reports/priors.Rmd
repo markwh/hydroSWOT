@@ -1,0 +1,34 @@
+---
+title: "priors"
+author: "Mark Hagemann"
+date: "November 2, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+The hydroSWOT dataset allows us to mine for the following prior distributions:
+
+- Ao (conditional on W statistics)
+    - lognormal with 
+    - mu = 0.8549474 + 1.3925854 * lwbar - 1.7249043 * lwsd, 
+    - sigma = 0.8229
+- b (conditional on sd(logW))
+    - beta with mean 0.0231 + 0.454 * sd(logW), variance 0.00975
+- AHG error: (don't actually need this--see math)
+    - relate to cor(logW, logQ)
+    - $var(e_{ahg}) = var(logW) - b^2var(logQ)$
+- logQ
+    - hyperprior on mean
+        - centered at logQWBM
+        - spread?
+    - hyperprior on variance
+        - get from database
+        - Here regulation structures, land-cover, slope?, climate would be useful
+        - relate to var(logW)
+- logn
+- Manning error
+- logQc
+- logWc

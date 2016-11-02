@@ -1,8 +1,12 @@
 # Reading in data
 
 hswot <- read.csv("data/SWOT_ADCP_Dataset.txt", sep = "\t") %>% 
+  mutate(q_meas_td = fixtzs(q_meas_td)) %>% 
   group_by(q_meas_td) %>% 
   mutate(datetime = mdy_hms(q_meas_dt, tz = q_meas_td[1])) %>% 
+  ungroup() %>% 
+  group_by(site_no) %>% 
+  arrange(datetime) %>% 
   ungroup()
 
 fieldref <- read.csv("data/FieldDefinitions.txt", sep = "\t")

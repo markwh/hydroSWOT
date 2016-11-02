@@ -63,7 +63,47 @@ hist(ahgMods.a$.resid, xlim = c(-1, 1), breaks = 200)
 car::qqPlot(ahgMods.a$.resid) # heavy tails
 qqplot(qcauchy(ppoints(500)), ahgMods.a$.resid)
 
+# fit a cauchy distribution
+
+fitdist(ahgMods.a$.resid, distr = "cauchy")
+qqplot(qcauchy(ppoints(500), location = -0.0008, scale = 0.069258), ahgMods.a$.resid)
+qqline(ahgMods.a$.resid, distribution = function(p) qcauchy(p, location = -0.0008, scale = 0.069258))
+
+
 ## Summary
 ahgMods.sum <- ahgMods.a %>% 
   group_by(station) %>% 
   summarize(sdLogW = sd(.resid))
+
+wsddat <- ahgMods.sum %>% 
+  transmute(xs = as.numeric(station),
+            sdLogW.r = sdLogW) %>% 
+  inner_join(aodat_nobad, by = "xs") %>% 
+  dplyr::select(sdLogW.r, lwbar:ha75)
+pairs(wsddat)
+
+plot(sdLogW.r ~ lwsd, wsddat, log = "xy")
+abline(0, 1)
+# so model sdlLogW.r as function of sdLogW
+
+wlm1 <- lm(lwsd)
+
+# is b affected by things we can measure?
+
+bpreddat <- bhats %>% 
+  ungroup() %>% 
+  select(xs, bhat) %>% 
+  inner_join(aodat_nobad, by = "xs") %>% 
+  select(bhat, lwbar:ha75, -lAo, n)
+pairs(bpreddat)
+summary(bpreddat)
+
+# Yes! lwsd. 
+
+blm1 <- lm(bhat ~ lwsd, bpreddat)
+summary(blm1)
+AIC(blm1)
+
+blm2 <- lm(bhat ~ poly(lwsd, degree = 2), bpreddat)
+summary(blm2)
+AIC(blm2)
