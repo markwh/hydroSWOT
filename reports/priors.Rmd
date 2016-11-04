@@ -28,6 +28,9 @@ The hydroSWOT dataset allows us to mine for the following prior distributions:
         - get from database
         - Here regulation structures, land-cover, slope?, climate would be useful
         - relate to var(logW)
+        - sd(logQ) is normal with mean 0.72469 + 0.5804 sd(logW) + 0.1509 sd(H), stdev 0.3587.
+        - all units in SI, all lograithms lm. 
+
 - logn
 - Manning error
 - logQc

@@ -41,13 +41,60 @@ senslope <- function(x, y)
 #' 
 dHdW <- function(H, W, lwr_p, upr_p) {
   ords <- order(W)
+  
+  stopifnot(all(ords >= 0))
   H <- H[ords]
   W <- W[ords]
 
+  
   minw <- quantile(W, lwr_p)
   maxw <- quantile(W, upr_p)
   
   inds <- W <= maxw & W >= minw
+  stopifnot(sum(inds) > 1)
+  
   out <- senslope(x = W[inds], y = H[inds])
   out
 }
+
+
+
+# Plotting station variables ----------------------------------------------
+
+
+ploth <- function(siteno, ...) {
+  hswot %>% 
+    filter(site_no == siteno) %>% 
+    # `[[`("stage_va") %>% 
+    plot(stage_va ~ datetime, ., main = station_nm[1], 
+         xlab = "Date", ylab = "Stage (ft)", ...)
+}
+
+# uses xsdat from xsarea.R
+plothw <- function(siteno, ...) {
+  xsdat %>% 
+    filter(xs == siteno) %>% 
+    # `[[`("stage_va") %>% 
+    plot(h_m ~ w_m, ., main = xsname[1], 
+         xlab = "Width (m)", ylab = "Stage (m)", ...)
+}
+
+
+plotqw <- function(siteno, log = "xy", ...) {
+  siteno <- as.character(siteno)
+  
+  hswot %>% 
+    filter(site_no == siteno) %>% 
+    plot(q_va ~ stream_wdth_va, ., main = station_nm[1],
+         xlab = "width (feet)", ylab = "flow (CFS)", ...)
+}
+
+
+orthog <- function(x, y) {
+  b <- y / sqrt(y %*% y)
+  a <- x %*% b
+  out <- x - a * b
+  out
+}
+
+

@@ -53,9 +53,22 @@ ahgMods.t <- lapply(ahgMods, tidy) %>%
   bind_rows(.id = "station") %>% 
   select(station, term, estimate) %>%
   spread(key = term, value = estimate) %>% 
-  setNames(station, a, b)
-tbl_df()
+  setNames(c("station", "a", "b")) %>% 
+  tbl_df()
 
+# loocv
+
+gcvs <- lapply(ahgMods, gcv)
+vars <- lapply(ahgMods, function(mod) var(mod$model$logW))
+q2s <- mapply(function(x, y) data.frame(Q2 = 1 - x / y), 
+              x = gcvs, y = vars, SIMPLIFY = FALSE) %>% 
+  bind_rows(.id = "site_no")
+hist(q2s$Q2)
+arrange(q2s, desc(Q2)) %>% 
+  head()
+
+
+plotqw("1198000")
 
 # Get standard deviation
 dim(ahgMods.a)
@@ -107,3 +120,62 @@ AIC(blm1)
 blm2 <- lm(bhat ~ poly(lwsd, degree = 2), bpreddat)
 summary(blm2)
 AIC(blm2)
+
+# Hyperprior on var(logQ)
+
+varqdat <- xsdat %>% 
+  filter(!(xs %in% badHstas),
+         n > 50) %>% 
+  group_by(xs, xsname) %>% 
+  summarize(lwbar = mean(logW),
+            lwsd = sd(logW),
+            lqbar = mean(logQ),
+            lqsd = sd(logQ),
+            # lqcv = sd(logQ) / mean(logQ),
+            sdabar = mean(sqrt(dA)),
+            sdasd = sd(sqrt(dA)),
+            hsd = sd(h_m)) %>% 
+  ungroup()
+
+glimpse(varqdat)
+pairs(varqdat[3:9]) # lwsd, maybe. But need to check log-transform madness.
+
+plot(lqsd ~ lwsd, varqdat)
+plot(lqsd^2 ~ lwsd^2, varqdat)
+plot(lqsd ~ lwsd, varqdat, log = "xy")
+plot(lqsd^2 ~ lwsd^2, varqdat, log = "xy")
+plot(lqsd ~ orthog(hsd, lwsd), varqdat)
+
+
+qsdlm1 <- lm(lqsd ~ lwsd, varqdat)
+summary(qsdlm1)
+
+qsdlm2 <- lm(lqsd ~ lwsd + hsd, varqdat)
+summary(qsdlm2)
+
+qsdlm3 <- lm(lqsd ~ lwsd + orthog(hsd, lwsd), varqdat)
+summary(qsdlm3)
+
+qsdlm4 <- lm(lqsd ~ (lwsd + hsd)^2, varqdat)
+summary(qsdlm4)
+
+qsdlm5 <- lm(lqsd ~ poly(lwsd, 2) + poly(hsd, 2), varqdat)
+summary(qsdlm5)
+
+
+AIC(qsdlm1)
+AIC(qsdlm2)
+AIC(qsdlm5)
+gcv(qsdlm1)
+sqrt(gcv(qsdlm2)) # This is RMSE of prediction -- becomes prior sd. 
+gcv(qsdlm5)
+
+visreg::visreg(qsdlm3)
+visreg::visreg(qsdlm5)
+
+hist(varqdat$lqsd)
+hist(varqdat$lqsd^2)
+
+
+varqdat$xs[which.min(varqdat$lqsd)]
+plotqw(siteno = 4159130)

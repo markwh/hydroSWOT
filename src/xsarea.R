@@ -40,6 +40,7 @@ hist(log10(aos))
 # Ao as a function of W, dA statistics
 
 aodat <- xsdat %>% 
+  filter(n > 20) %>% 
   group_by(xs, xsname) %>% 
   summarize(lwbar = mean(logW),
             lwsd = sd(logW),
@@ -79,6 +80,7 @@ ad1$h_m
 # incorporating work done in reports/heightAnomalies.Rmd
 
 cstats$cpstat[1:50] %>% plot(log = "y")
+fromcache("cstats")
 badHstas <- cstats$xs[1:25]
 
 aodat_nobad <- xsdat %>% 

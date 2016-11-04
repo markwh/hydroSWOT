@@ -1,0 +1,27 @@
+---
+title: "residual variance"
+author: "Mark Hagemann"
+date: "November 3, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Something that came out of playing around with variance equations. 
+
+
+```{r}
+i <- sample(names(ahgMods), 1)
+foo <- ahgMods[[i]]
+
+var(residuals(foo))
+
+vw <- var(foo$model$logW)
+b <- foo$coefficients[2]
+vq <- var(foo$model$logQ)
+
+vw - b^2*vq
+```
+

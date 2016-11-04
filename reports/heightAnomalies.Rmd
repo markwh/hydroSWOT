@@ -54,7 +54,7 @@ Both have about the same range in reported stage, but only one is obviously prob
 
 I'm trying an R package produced by Twitter called [BreakoutDetection](https://github.com/twitter/BreakoutDetection). 
 
-```{r}
+```{r, eval = FALSE}
 devtools::install_github("twitter/BreakoutDetection")
 library(BreakoutDetection)
 
@@ -66,7 +66,7 @@ breakout(filter(hswot, site_no == 7288800)$stage_va,
 
 Apply this to every station
 
-```{r}
+```{r, eval = FALSE}
 
 brstat <- function(x, nperm = 500, ...) {
   br <- breakout(x, nperm = nperm, ...)
@@ -94,7 +94,7 @@ summary(bstats$brstat)
 
 I don't know what test statistic this uses for detecting change points, but here is the result arranged descending by this value.
 
-```{r}
+```{r, eval = FALSE}
 
 bstats %>% 
   ungroup() %>% 
@@ -114,7 +114,7 @@ I agree that this looks anomalous, and for more than just having a breakpoint. N
 
 Here's the second-worst by the above table.
 
-```{r}
+```{r, eval = FALSE}
 plothw(arrange(bstats, desc(brstat))$site_no[i])
 
 i <- i + 1
@@ -151,7 +151,7 @@ I'm not thrilled with the breakpoint function, although it might work as a last 
 
 Trying now the changepoint package.
 
-```{r}
+```{r, eval = FALSE}
 install.packages("changepoint")
 library(changepoint)
 ?cpt.mean
@@ -170,7 +170,8 @@ hs2 <- hswot %>%
             logW = log(w_m),
             h = stage_va,
             xs = site_no, 
-            xsname = station_nm)
+            xsname = station_nm) %>% 
+  filter(!is.na(h))
 cpt1 <- cpt.mean(hs2$h, class = FALSE)
 
 cpt1

@@ -40,26 +40,6 @@ hswot %>%
   arrange(desc(hrange)) %>% 
   print(n = 40)
 
-# uses xsdat from xsarea.R
-
-ploth <- function(siteno, ...) {
-  hswot %>% 
-    filter(site_no == siteno) %>% 
-    # `[[`("stage_va") %>% 
-    plot(stage_va ~ datetime, ., main = station_nm[1], 
-         xlab = "Date", ylab = "Stage (ft)", ...)
-}
-
-plothw <- function(siteno, ...) {
-  xsdat %>% 
-    filter(xs == siteno) %>% 
-    # `[[`("stage_va") %>% 
-    plot(h_m ~ w_m, ., main = xsname[1], 
-         xlab = "Width (m)", ylab = "Stage (m)", ...)
-}
-
-plothw(9529300)
-
 # Trying anomalyDetection package
 devtools::install_github("twitter/AnomalyDetection")
 library(AnomalyDetection)
