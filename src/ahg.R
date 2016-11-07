@@ -119,7 +119,15 @@ AIC(blm1)
 
 blm2 <- lm(bhat ~ poly(lwsd, degree = 2), bpreddat)
 summary(blm2)
+gcv(blm2)
 AIC(blm2)
+
+png(filename = "b_fit.png", width = 600, height = 300)
+op <- par(no.readonly = TRUE)
+par(mfrow = c(1, 2))
+visreg::visreg(blm2)
+par(op)
+dev.off()
 
 # Hyperprior on var(logQ)
 
@@ -152,6 +160,7 @@ summary(qsdlm1)
 
 qsdlm2 <- lm(lqsd ~ lwsd + hsd, varqdat)
 summary(qsdlm2)
+visreg::visreg(qsdlm2)
 
 qsdlm3 <- lm(lqsd ~ lwsd + orthog(hsd, lwsd), varqdat)
 summary(qsdlm3)
@@ -179,3 +188,12 @@ hist(varqdat$lqsd^2)
 
 varqdat$xs[which.min(varqdat$lqsd)]
 plotqw(siteno = 4159130)
+
+
+
+png(filename = "qsd_fit.png", width = 600, height = 300)
+op <- par(no.readonly = TRUE)
+par(mfrow = c(1, 2))
+visreg::visreg(qsdlm2)
+par(op)
+dev.off()

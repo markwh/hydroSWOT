@@ -6,8 +6,17 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+opts_chunk$set(echo = TRUE, message = FALSE, warning = FALSE)
+opts_knit$set(root.dir = "..")
 ```
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(ProjectTemplate)
+load.project()
+fromcache("bstats")
+```
+
 
 When trying to use the hydroSWOT database to predict Ao using SWOT-available measurements, I ran into some strange behavior in some of the stations' stage height data. Here's stage vs. time for the Seneca River at Seneca Falls:
 
@@ -23,7 +32,7 @@ hswot %>%
   group_by(site_no) %>% 
   summarize(hrange = max(stage_va) - min(stage_va), n = n()) %>% 
   arrange(desc(hrange)) %>% 
-  print(n = 40) %>% 
+  head(n = 40L) %>% 
   kable()
 ```
 
@@ -205,7 +214,7 @@ summary(bstats$brstat)
 
 ```
 
-```{r}
+```{r, eval = FALSE}
 plothw(cstats$xs[i])
 
 i <- i + 1

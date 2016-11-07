@@ -3,37 +3,10 @@
 # 10/31/2016
 # cross-sectional area computation
 
-
-xsdat <- hswot %>%  
-  filter(!is.na(xsec_area_va),
-         xsec_area_va > 0) %>% 
-  transmute(datetime = datetime,
-            q_m3s = q_va * 0.028317,
-            w_m = stream_wdth_va / 3.28084,
-            logQ = log(q_m3s),
-            logW = log(w_m),
-            h_m = stage_va / 3.28084,
-            xs = site_no, 
-            xsname = station_nm, 
-            area = xsec_area_va) %>% 
-  filter(w_m > 0, q_m3s > 0, !is.na(h_m)) %>% 
-  tbl_df() %>% 
-  group_by(xs) %>% 
-  mutate(Ao = min(area),
-         dA = area - Ao, 
-         n = n()) %>% 
-  ungroup()
-
-summary(xsdat)
-glimpse(xsdat)
-
-
 # Area as a function of W
-
 plot(area ~ logW, sample_n(xsdat, 10000), log = "y")
 
 # Distribution of Ao
-
 aos <- unique(xsdat$Ao)
 hist(log10(aos))
 
@@ -57,15 +30,24 @@ summary(aodat)
 pairs(aodat[-1:-2])
 aodat %>% 
   filter(n > 50) %>% 
-  select(lwbar : ha75) %>% 
+  select(lwbar : ha75, n) %>% 
   pairs()
 
 # model lAo ~ lwbar + lwsd
 
 alm1 <- lm(lAo ~ lwbar + lwsd, data = aodat)
 summary(alm1)
+AIC(alm1)
 alm2 <- lm(lAo ~ lwbar, data = aodat)
 summary(alm2)
+AIC(alm2)
+
+png(filename = "Ao_fit.png", width = 600, height = 300)
+op <- par(no.readonly = TRUE)
+par(mfrow = c(1, 2))
+visreg::visreg(alm1)
+par(op)
+dev.off()
 
 # Look at a single xs data
 
