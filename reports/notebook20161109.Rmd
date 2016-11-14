@@ -1,0 +1,26 @@
+---
+title: "notebook20161109"
+author: "Mark Hagemann"
+date: "November 9, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Look at largest sd(logQ)
+
+```{r}
+with(varqdat, xs[which.max(lqsd)])
+with(varqdat, max(lqsd))
+
+
+plotqw(7348700)
+
+hswot %>% 
+  filter(site_no == 7348700) %>% 
+  plot(q_va ~ datetime, ., log = "y")
+  glimpse
+```
+

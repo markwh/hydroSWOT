@@ -97,4 +97,7 @@ orthog <- function(x, y) {
   out
 }
 
-
+## Reference for hydroswot columns
+fieldref <- read.csv("data/FieldDefinitions.txt", sep = "\t")
+fr <- function(field)
+  dplyr::filter(fieldref, grepl(field, Field))
