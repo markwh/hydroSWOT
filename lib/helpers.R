@@ -45,7 +45,6 @@ dHdW <- function(H, W, lwr_p, upr_p) {
   stopifnot(all(ords >= 0))
   H <- H[ords]
   W <- W[ords]
-
   
   minw <- quantile(W, lwr_p)
   maxw <- quantile(W, upr_p)
@@ -53,7 +52,7 @@ dHdW <- function(H, W, lwr_p, upr_p) {
   inds <- W <= maxw & W >= minw
   stopifnot(sum(inds) > 1)
   
-  out <- senslope(x = W[inds], y = H[inds])
+  out <- slope(x = W[inds], y = H[inds])
   out
 }
 
@@ -101,3 +100,15 @@ orthog <- function(x, y) {
 fieldref <- read.csv("data/FieldDefinitions.txt", sep = "\t")
 fr <- function(field)
   dplyr::filter(fieldref, grepl(field, Field))
+
+
+## changepoint statistic
+cpstat <- function(x, ...) {
+  cp <- cpt.mean(x, method = "BinSeg", Q = 1, ...)
+  out <- cp@pen.value.full
+  out
+}
+
+## AHG b parameter
+getb <- function(logW, logQ)
+  cor(logW, logQ) * sd(logW) / sd(logQ)

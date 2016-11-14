@@ -33,10 +33,48 @@ hswot <- hswot0 %>%
 xsdat <- hswot %>%  
   filter(!is.na(area_m2),
          area_m2 > 0,
+         !is.na(w_m),
+         w_m > 0, 
          !is.na(h_m)) %>%
   tbl_df() %>% 
   group_by(xs) %>% 
-  mutate(Ao = min(area),
-         dA = area - Ao, 
+  mutate(Ao = min(area_m2),
+         dA = area_m2 - Ao, 
          n = n()) %>% 
   ungroup()
+
+# Ao as a function of W, dA statistics
+aodat <- xsdat %>% 
+  filter(n > 20) %>% 
+  group_by(xs, xsname) %>% 
+  summarize(lwbar = mean(logW),
+            lwsd = sd(logW),
+            sdabar = mean(sqrt(dA)),
+            sdasd = sd(sqrt(dA)),
+            lAo = log(Ao[1]),
+            ha25 = dHdW(h_m, W = w_m, lwr_p = 0, upr_p = 0.25),
+            ha50 = dHdW(h_m, W = w_m, lwr_p = .25, upr_p = .50),
+            ha75 = dHdW(h_m, W = w_m, lwr_p = .5, upr_p = .75),
+            n = n()) %>% 
+  ungroup()
+
+## height anomalies, computed in reports/heightAnomalies.Rmd
+
+cstats <- xsdat %>%
+  filter(n > 20) %>% 
+  group_by(xs, xsname) %>% 
+  summarize(cpstat = cpstat(h_m)) %>% 
+  ungroup() %>% 
+  mutate(xs = as.character(xs)) %>% 
+  arrange(desc(cpstat))
+
+# Removing anomalous heights using work in reports/heightAnomalies.Rmd
+badHstas <- cstats$xs[1:25]
+aodat_nobad <- aodat %>% 
+  filter(!(xs %in% badHstas))
+
+# data for computing AHG parameters
+bdata <- hswot %>% 
+  filter(w_m > 0, q_m3s > 0) %>% 
+  tbl_df()
+

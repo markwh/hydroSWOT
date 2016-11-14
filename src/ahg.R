@@ -3,22 +3,7 @@
 # 10/31/2016
 # computing AHG relationships
 
-
-# simple data frame for computing ahg
-bdata <- hswot %>% 
-  transmute(q_m3s = q_va * 0.028317,
-            w_m = stream_wdth_va / 3.28084,
-            logQ = log(q_m3s),
-            logW = log(w_m),
-            xs = site_no, 
-            xsname = station_nm) %>% 
-  filter(w_m > 0, q_m3s > 0) %>% 
-  tbl_df()
-
-getb <- function(logW, logQ)
-  cor(logW, logQ) * sd(logW) / sd(logQ)
-
-
+# b 
 bhats <- bdata %>% 
   group_by(xsname, xs) %>% 
   summarize(n = n(), bhat = getb(logW, logQ)) %>% 
@@ -33,9 +18,6 @@ bhats %>%
 
 # distribution of AHG errors
 ahgMods <- bdata %>% 
-  group_by(xsname)
-
-ahgMods <- bdata %>% 
   group_by(xsname, xs) %>%
   mutate(n = n()) %>% 
   ungroup() %>% 
@@ -49,15 +31,6 @@ ahgMods.a <- lapply(ahgMods, augment) %>%
          What = exp(.hat),
          Wresid = W - What)
 
-ahgMods.t <- lapply(ahgMods, tidy) %>% 
-  bind_rows(.id = "station") %>% 
-  select(station, term, estimate) %>%
-  spread(key = term, value = estimate) %>% 
-  setNames(c("station", "a", "b")) %>% 
-  tbl_df()
-
-# loocv
-
 gcvs <- lapply(ahgMods, gcv)
 vars <- lapply(ahgMods, function(mod) var(mod$model$logW))
 q2s <- mapply(function(x, y) data.frame(Q2 = 1 - x / y), 
@@ -67,9 +40,6 @@ hist(q2s$Q2)
 arrange(q2s, desc(Q2)) %>% 
   head()
 
-
-plotqw("1198000")
-
 # Get standard deviation
 dim(ahgMods.a)
 hist(ahgMods.a$.resid, xlim = c(-1, 1), breaks = 200)
@@ -77,11 +47,9 @@ car::qqPlot(ahgMods.a$.resid) # heavy tails
 qqplot(qcauchy(ppoints(500)), ahgMods.a$.resid)
 
 # fit a cauchy distribution
-
 fitdist(ahgMods.a$.resid, distr = "cauchy")
 qqplot(qcauchy(ppoints(500), location = -0.0008, scale = 0.069258), ahgMods.a$.resid)
 qqline(ahgMods.a$.resid, distribution = function(p) qcauchy(p, location = -0.0008, scale = 0.069258))
-
 
 ## Summary
 ahgMods.sum <- ahgMods.a %>% 
@@ -105,7 +73,7 @@ wlm1 <- lm(lwsd)
 
 bpreddat <- bhats %>% 
   ungroup() %>% 
-  select(xs, bhat) %>% 
+  dplyr::select(xs, bhat) %>% 
   inner_join(aodat_nobad, by = "xs") %>% 
   select(bhat, lwbar:ha75, -lAo, n)
 pairs(bpreddat)
@@ -130,7 +98,6 @@ par(op)
 dev.off()
 
 # Hyperprior on var(logQ)
-
 varqdat <- xsdat %>% 
   filter(!(xs %in% badHstas),
          n > 50) %>% 
@@ -188,8 +155,6 @@ hist(varqdat$lqsd^2)
 
 varqdat$xs[which.min(varqdat$lqsd)]
 plotqw(siteno = 4159130)
-
-
 
 png(filename = "qsd_fit.png", width = 600, height = 300)
 op <- par(no.readonly = TRUE)

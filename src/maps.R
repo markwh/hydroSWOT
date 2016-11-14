@@ -42,16 +42,3 @@ leaflet(ahgMapData) %>%
                    color = ~pal(Q2), 
                    popup = ~format(Q2, digits = 3, scientific = FALSE),
                    stroke = FALSE, fillOpacity = 0.5)
-
-  
-  
-  
-  df <- read.csv(textConnection(
-    "Name,Lat,Long
-    Samurai Noodle,47.597131,-122.327298
-    Kukai Ramen,47.6154,-122.327157
-    Tsukushinbo,47.59987,-122.326726"
-  ))
-  
-  leaflet(df) %>% addTiles() %>%
-    addMarkers(~Long, ~Lat, popup = ~htmlEscape(Name))
