@@ -78,3 +78,18 @@ bdata <- hswot %>%
   filter(w_m > 0, q_m3s > 0) %>% 
   tbl_df()
 
+# data for computing sdlogQ hyperprior
+
+varqdat <- xsdat %>% 
+  filter(!(xs %in% badHstas),
+         n > 50) %>% 
+  group_by(xs, xsname) %>% 
+  summarize(lwbar = mean(logW),
+            lwsd = sd(logW),
+            lqbar = mean(logQ),
+            lqsd = sd(logQ),
+            # lqcv = sd(logQ) / mean(logQ),
+            sdabar = mean(sqrt(dA)),
+            sdasd = sd(sqrt(dA)),
+            hsd = sd(h_m)) %>% 
+  ungroup()

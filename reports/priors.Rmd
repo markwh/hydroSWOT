@@ -2,36 +2,136 @@
 title: "priors"
 author: "Mark Hagemann"
 date: "November 2, 2016"
-output: html_document
+output: 
+  html_document:
+    toc: true
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+library(knitr)
+opts_chunk$set(echo = FALSE, results = "asis",
+               warning = FALSE, message = FALSE)
+opts_knit$set(root.dir = "..")
 ```
+
+```{r}
+library(ProjectTemplate)
+load.project(override.config = list(cache_loading = TRUE, munging = FALSE))
+library(visreg)
+library(stargazer)
+
+doctype = "html"
+```
+
 
 The hydroSWOT dataset allows us to mine for the following prior distributions:
 
-- Ao (conditional on W statistics) -- 
-    - lognormal with 
-    - mu = 0.8549474 + 1.3925854 * lwbar - 1.7249043 * lwsd, 
-    - sigma = 0.8229
-- b (conditional on sd(logW))
-    - beta with mean 0.0231 + 0.454 * sd(logW), variance 0.00975
-- AHG error: (don't actually need this--see math)
-    - relate to cor(logW, logQ)
-    - $var(e_{ahg}) = var(logW) - b^2var(logQ)$
-- logQ
-    - hyperprior on mean
-        - centered at logQWBM
-        - spread?
-    - hyperprior on variance
-        - get from database
-        - Here regulation structures, land-cover, slope?, climate would be useful
-        - relate to var(logW)
-        - sd(logQ) is normal with mean 0.72469 + 0.5804 sd(logW) + 0.1509 sd(H), stdev 0.3587.
-        - all units in SI, all lograithms lm. 
+### Ao (conditional on W statistics) -- 
 
-- logn
-- Manning error
-- logQc
-- logWc
+- lognormal with 
+- mu = 0.8549474 + 1.3925854 * lwbar - 1.7249043 * lwsd, 
+- sigma = 0.8229
+
+```{r}
+fromcache("alm")
+coefs <- coef(alm)
+nc <- length(coefs)
+
+ggTermPlot(alm, xvar = names(coefs)[2], data = alm$model)
+ggTermPlot(alm, xvar = names(coefs)[3], data = alm$model)
+
+stargazer(alm, type = doctype)
+```
+
+The standard deviation comes from the GCV: 
+
+```{r, echo = TRUE}
+sqrt(gcv(alm))
+```
+
+
+### b (conditional on sd(logW))
+
+- truncated normal with mean 0.0231 + 0.454 * sd(logW), variance 0.00975
+
+```{r}
+fromcache("blm")
+fromcache("bpreddat")
+coefs <- coef(blm)
+nc <- length(coefs)
+
+vars <- all.vars(blm$call$formula)[-1]
+
+ggTermPlot(blm, xvar = vars[1], data = bpreddat)
+
+stargazer(blm, type = doctype)
+```
+
+The standard deviation comes from the GCV: 
+
+```{r, echo = TRUE}
+sqrt(gcv(blm))
+```
+
+
+
+### AHG error: (don't actually need this--see math)
+
+- relate to cor(logW, logQ)
+- $var(e_{ahg}) = var(logW) - b^2var(logQ)$
+
+### logQ
+
+- hyperprior on mean
+    - centered at logQWBM
+    - spread?
+- hyperprior on variance
+    - get from database
+    - Here regulation structures, land-cover, slope?, climate would be useful
+    - relate to var(logW)
+    - sd(logQ) is normal with mean 0.72469 + 0.5804 sd(logW) + 0.1509 sd(H), stdev 0.3587.
+    - all units in SI, all lograithms lm. 
+
+```{r}
+fromcache("qsdlm")
+coefs <- coef(qsdlm)
+nc <- length(coefs)
+
+ggTermPlot(qsdlm, xvar = names(coefs)[2], data = qsdlm$model)
+ggTermPlot(qsdlm, xvar = names(coefs)[3], data = qsdlm$model)
+
+stargazer(qsdlm, type = doctype)
+```
+
+
+The standard deviation comes from the GCV: 
+
+```{r, echo = TRUE}
+sqrt(gcv(qsdlm))
+```
+
+
+
+### logn
+
+Prior is normal(-3.5, 1). Resulting in a lognormal(-3.5, 1) prior on n. That looks like:
+
+```{r}
+ns <- seq(0.001, 0.3, length.out = 10000)
+plot(ns,  dlnorm(ns, -3.5, 1), type = "h")
+```
+
+
+### Manning error
+
+I haven't found a good source for Manning's error statistics. But Dingman (1997) gives RMSE of log10(Q) for a couple modifications of Manning's equation. This is given as about 0.25. 
+
+
+
+### logQc
+
+We still don't really know what Qc represents, physically. So hard to constrain at this point. But best guess is it's near mean(logQ)
+
+### logWc
+
+Also not sure on this one. We'll know more when we get an AMHG validation set.

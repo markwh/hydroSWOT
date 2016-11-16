@@ -25,6 +25,10 @@ alm2 <- lm(lAo ~ lwbar, data = aodat)
 summary(alm2)
 AIC(alm2)
 
+## Save model 
+
+alm <- alm1
+cache("alm")
 
 ## Save plot
 png(filename = "Ao_fit.png", width = 600, height = 300)
