@@ -91,7 +91,7 @@ summary(blm2)
 gcv(blm2)
 AIC(blm2)
 
-blm <- blm2
+blm <- blm1
 cache("blm")
 
 png(filename = "b_fit.png", width = 600, height = 300)

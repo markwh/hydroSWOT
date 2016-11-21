@@ -25,7 +25,10 @@ hswot <- hswot0 %>%
             h_m = stage_va / 3.28084,
             xs = site_no, 
             xsname = station_nm, 
-            area_m2 = xsec_area_va * 0.092903)
+            area_m2 = xsec_area_va * 0.092903,
+            lat = dec_lat_va,
+            lon = dec_long_va,
+            xs = site_no)
 
 
 ### Data for inspecting cross-sections

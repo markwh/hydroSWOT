@@ -18,7 +18,7 @@ aodat %>%
   pairs()
 
 # model lAo ~ lwbar + lwsd
-alm1 <- lm(lAo ~ lwbar + lwsd, data = filter(aodat))
+alm1 <- lm(lAo ~ lwbar + lwsd, data = aodat)
 summary(alm1)
 AIC(alm1)
 alm2 <- lm(lAo ~ lwbar, data = aodat)
