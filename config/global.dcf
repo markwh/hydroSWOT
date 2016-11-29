@@ -7,7 +7,7 @@ logging: FALSE
 load_libraries: TRUE
 libraries: reshape2, ggplot2, stringr, lubridate, todoList, markstats,
       R.matlab, testthat, dplyr, tidyr, broom, fitdistrplus, zyp, changepoint,
-      knitr
+      knitr, foreign, Hmisc
 as_factors: FALSE
 data_tables: FALSE
 attach_internal_libraries: FALSE
