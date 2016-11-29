@@ -25,7 +25,10 @@ hswot <- hswot0 %>%
             h_m = stage_va / 3.28084,
             xs = site_no, 
             xsname = station_nm, 
-            area_m2 = xsec_area_va * 0.092903)
+            area_m2 = xsec_area_va * 0.092903,
+            lat = dec_lat_va,
+            lon = dec_long_va,
+            xs = site_no)
 
 
 ### Data for inspecting cross-sections
@@ -78,3 +81,18 @@ bdata <- hswot %>%
   filter(w_m > 0, q_m3s > 0) %>% 
   tbl_df()
 
+# data for computing sdlogQ hyperprior
+
+varqdat <- xsdat %>% 
+  filter(!(xs %in% badHstas),
+         n > 50) %>% 
+  group_by(xs, xsname) %>% 
+  summarize(lwbar = mean(logW),
+            lwsd = sd(logW),
+            lqbar = mean(logQ),
+            lqsd = sd(logQ),
+            # lqcv = sd(logQ) / mean(logQ),
+            sdabar = mean(sqrt(dA)),
+            sdasd = sd(sqrt(dA)),
+            hsd = sd(h_m)) %>% 
+  ungroup()

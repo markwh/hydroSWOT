@@ -75,9 +75,10 @@ bpreddat <- bhats %>%
   ungroup() %>% 
   dplyr::select(xs, bhat) %>% 
   inner_join(aodat_nobad, by = "xs") %>% 
-  select(bhat, lwbar:ha75, -lAo, n)
+  dplyr::select(bhat, lwbar:ha75, -lAo, n)
 pairs(bpreddat)
 summary(bpreddat)
+cache("bpreddat")
 
 # Yes! lwsd. 
 
@@ -90,75 +91,12 @@ summary(blm2)
 gcv(blm2)
 AIC(blm2)
 
+blm <- blm1
+cache("blm")
+
 png(filename = "b_fit.png", width = 600, height = 300)
 op <- par(no.readonly = TRUE)
 par(mfrow = c(1, 2))
 visreg::visreg(blm2)
-par(op)
-dev.off()
-
-# Hyperprior on var(logQ)
-varqdat <- xsdat %>% 
-  filter(!(xs %in% badHstas),
-         n > 50) %>% 
-  group_by(xs, xsname) %>% 
-  summarize(lwbar = mean(logW),
-            lwsd = sd(logW),
-            lqbar = mean(logQ),
-            lqsd = sd(logQ),
-            # lqcv = sd(logQ) / mean(logQ),
-            sdabar = mean(sqrt(dA)),
-            sdasd = sd(sqrt(dA)),
-            hsd = sd(h_m)) %>% 
-  ungroup()
-
-glimpse(varqdat)
-pairs(varqdat[3:9]) # lwsd, maybe. But need to check log-transform madness.
-
-plot(lqsd ~ lwsd, varqdat)
-plot(lqsd^2 ~ lwsd^2, varqdat)
-plot(lqsd ~ lwsd, varqdat, log = "xy")
-plot(lqsd^2 ~ lwsd^2, varqdat, log = "xy")
-plot(lqsd ~ orthog(hsd, lwsd), varqdat)
-
-
-qsdlm1 <- lm(lqsd ~ lwsd, varqdat)
-summary(qsdlm1)
-
-qsdlm2 <- lm(lqsd ~ lwsd + hsd, varqdat)
-summary(qsdlm2)
-visreg::visreg(qsdlm2)
-
-qsdlm3 <- lm(lqsd ~ lwsd + orthog(hsd, lwsd), varqdat)
-summary(qsdlm3)
-
-qsdlm4 <- lm(lqsd ~ (lwsd + hsd)^2, varqdat)
-summary(qsdlm4)
-
-qsdlm5 <- lm(lqsd ~ poly(lwsd, 2) + poly(hsd, 2), varqdat)
-summary(qsdlm5)
-
-
-AIC(qsdlm1)
-AIC(qsdlm2)
-AIC(qsdlm5)
-gcv(qsdlm1)
-sqrt(gcv(qsdlm2)) # This is RMSE of prediction -- becomes prior sd. 
-gcv(qsdlm5)
-
-visreg::visreg(qsdlm3)
-visreg::visreg(qsdlm5)
-
-hist(varqdat$lqsd)
-hist(varqdat$lqsd^2)
-
-
-varqdat$xs[which.min(varqdat$lqsd)]
-plotqw(siteno = 4159130)
-
-png(filename = "qsd_fit.png", width = 600, height = 300)
-op <- par(no.readonly = TRUE)
-par(mfrow = c(1, 2))
-visreg::visreg(qsdlm2)
 par(op)
 dev.off()

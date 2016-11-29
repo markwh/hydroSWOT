@@ -1,0 +1,68 @@
+---
+title: "notebook20161121"
+author: "Mark Hagemann"
+date: "November 21, 2016"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+Looking at outlying data points in alm1.
+
+```{r}
+ggTermPlot(alm, xvar = names(coefs)[2], data = alm$model)
+ggTermPlot(alm, xvar = names(coefs)[3], data = alm$model)
+
+hist(residuals(alm))
+qqnorm(residuals(alm))
+
+badcases <- which(residuals(alm) < -2.8)
+badcases
+```
+
+
+```{r}
+baddat <- aodat[badcases,]
+glimpse(baddat)
+
+badAstas <- filter(hswot, xs %in% baddat$xs)
+glimpse(badAstas)
+```
+
+```{r}
+library(leaflet)
+leaflet(badAstas) %>% 
+  addTiles() %>% 
+  addCircleMarkers(lng = ~lon, lat = ~lat)
+```
+
+Looking at Locust Fork
+
+```{r}
+lfork <- grep("locust fork", badAstas$xsname, ignore.case = TRUE)
+
+badAstas$xsname[lfork]
+
+badAstas[lfork, ] %>% 
+  plot(area_m2 ~ log(w_m), .)
+```
+
+Looks like it's influenced by a major flood outlier. Pick another one. 
+
+```{r}
+# set.seed(497)
+badi <- sample(unique(badAstas$xsname), 1)
+badi
+badAstas %>%
+  filter(xsname == badi) %>% 
+  plot(area_m2 ~ w_m, ., log = "xy", main = badi)
+```
+
+Many of these just have suspect data points corresponding to small areas.
+
+
+## Looking at b predictions
+
+Can do the same for b. 
