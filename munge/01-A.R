@@ -50,7 +50,7 @@ xsdat <- hswot %>%
 aodat <- xsdat %>% 
   filter(n > 20) %>% 
   group_by(xs, xsname) %>% 
-  summarize(lwbar = mean(logW),
+  dplyr::summarize(lwbar = mean(logW),
             lwsd = sd(logW),
             sdabar = mean(sqrt(dA)),
             sdasd = sd(sqrt(dA)),
@@ -66,7 +66,7 @@ aodat <- xsdat %>%
 cstats <- xsdat %>%
   filter(n > 20) %>% 
   group_by(xs, xsname) %>% 
-  summarize(cpstat = cpstat(h_m)) %>% 
+  dplyr::summarize(cpstat = cpstat(h_m)) %>% 
   ungroup() %>% 
   mutate(xs = as.character(xs)) %>% 
   arrange(desc(cpstat))
@@ -87,7 +87,7 @@ varqdat <- xsdat %>%
   filter(!(xs %in% badHstas),
          n > 50) %>% 
   group_by(xs, xsname) %>% 
-  summarize(lwbar = mean(logW),
+  dplyr::summarize(lwbar = mean(logW),
             lwsd = sd(logW),
             lqbar = mean(logQ),
             lqsd = sd(logQ),

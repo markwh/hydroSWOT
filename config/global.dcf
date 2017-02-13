@@ -6,8 +6,8 @@ munging: TRUE
 logging: FALSE
 load_libraries: TRUE
 libraries: reshape2, ggplot2, stringr, lubridate, todoList, markstats,
-      R.matlab, testthat, dplyr, tidyr, broom, fitdistrplus, zyp, changepoint,
-      knitr, foreign, Hmisc
+      R.matlab, testthat, tidyr, broom, fitdistrplus, zyp, changepoint,
+      knitr, foreign, Hmisc, car, dplyr
 as_factors: FALSE
 data_tables: FALSE
 attach_internal_libraries: FALSE

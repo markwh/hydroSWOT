@@ -1,0 +1,24 @@
+---
+title: "forSWOTPaper"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+glimpse(hswot)
+
+nxs <- length(unique(hswot$xs))
+nxs
+
+nobs <- hswot %>% 
+  group_by(xs) %>% 
+  summarize(n = n())
+summary(nobs)
+
+hist(log10(nobs))
+
+```
+

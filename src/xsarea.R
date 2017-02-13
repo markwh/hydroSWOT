@@ -4,7 +4,7 @@
 # cross-sectional area computation
 
 # Area as a function of W
-plot(area ~ logW, sample_n(xsdat, 10000), log = "y")
+plot(area_m2 ~ logW, sample_n(xsdat, 10000), log = "y")
 
 # Distribution of Ao
 aos <- unique(xsdat$Ao)
