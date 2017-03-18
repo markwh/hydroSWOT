@@ -54,18 +54,18 @@ qqline(ahgMods.a$.resid, distribution = function(p) qcauchy(p, location = -0.000
 ## Summary
 ahgMods.sum <- ahgMods.a %>% 
   group_by(station) %>% 
-  summarize(sdLogW = sd(.resid))
+  summarize(lwsd = sd(.resid))
 
 wsddat <- ahgMods.sum %>% 
   transmute(xs = as.numeric(station),
-            sdLogW.r = sdLogW) %>% 
+            sdLogW.r = lwsd) %>% 
   inner_join(aodat_nobad, by = "xs") %>% 
   dplyr::select(sdLogW.r, lwbar:ha75)
 pairs(wsddat)
 
 plot(sdLogW.r ~ lwsd, wsddat, log = "xy")
 abline(0, 1)
-# so model sdlLogW.r as function of sdLogW
+# so model sdlLogW.r as function of lwsd
 
 wlm1 <- lm(lwsd)
 
