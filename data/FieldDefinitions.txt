@@ -1,0 +1,76 @@
+Field	Description	Units or Notes
+host	NWIS host	dimensionless
+agency_cd	Agency code	code
+site_no	Site number	dimensionless
+station_nm	Station name	dimensionless
+dec_lat_va	Decimal latitude	degrees
+dec_long_va	Decimal longitude	degrees
+coord_datum_cd	Latitude and longitude (horizontal) coordinate datum	degrees
+drain_area_va	Drainage area	square mile
+contrib_drain_area_va	Contributing drainage area	square mile
+alt_va	Gage or land surface datum	feet
+alt_datum_cd	Geodetic or local vertical datum of the altitude datum altitude component	code
+site_tp_cd	Site type code	code
+ad_site_cd	Indicates whether the site is slope-affected, index velocity, a structure like a dam	code
+site_visit_start_dt	Starting date and time of the site visit	time
+site_visit_start_dt_sg	Starting date and time significant figures of the site visit	code
+data_aging_cd	Code identifying the data aging status of the measurement	code
+q_meas_no	Discharge measurement activity number	dimensionless
+q_meas_dt	Official date and time of the discharge measurement; usually the mean of the start and end date and time (if specified)	time
+q_meas_td	Discharge measurement official date and time datum	date and time
+q_va	Discharge value	cubic feet per second
+stage_va	Value of the stream stage that corresponds to the discharge flowing past the gage	feet
+stage_diff_va	Change in stage during measurement	feet
+stage_diff_du	Duration of the change in stage measurement	second
+mean_idx_vel_va	Mean index velocity measured during the discharge measurement	feet per second
+std_second_area_va	Stream cross-section area at the standard cross-section	square feet
+std_second_vel_va	Stream velocity at the standard cross-section	feet per second
+q_adj_va	Discharge adjustment from the measured channels to the final discharge value	cubic feet per second
+base_flw_cd	Standard discharge measurement base flow code Describes whether the stream flow is base flow or not	code
+q_meas_qual_cd	Code identifying a stream discharge measurement quality qualifier	code
+q_meas_used_fg	Was this discharge measurement used in records processing	Y equals Yes; N equals No
+q_meas_chan_nu	Discharge measurement channel number	dimensionless
+stream_wdth_va	Output rounding code of the stream width value	feet
+xsecond_area_va	Area of the measurement section	square feet
+mean_vel_va	Average stream velocity during the measurement	feet per second
+max_vel_va	Maximum velocity recorded from all transects of the measurement	feet per second
+q_coef_var_va	Standard deviation of the total discharges for all transects in the measurement divided by the mean discharge for all measurements; this parameter provides a standardized estimate of the variation of discharges in the measurement	dimensionless
+flw_meas_fc	Percent of the total discharge actually measured by the profiler; it is computed by taking the mean middle discharge divided by the mean total discharge	 percent 
+mean_depth_va	Mean depth is the weighted mean water depth for the measurement; the mean depth is weighted based on the distance between individual profiles (and depth measurements)	feet
+max_depth_va	Maximum measured depth in feet for all transects of the measurement	feet
+adcp_freq_cd	Code indicating the frequency of the ADCP	code
+q_meas_type_cd	Code identifying a stream discharge measurement type (wading, bridge, ice, boat)	code
+q_meth_cd	Code identifying the stream discharge measurement method in detail	code
+vel_meth_cd	Code identifying the method of determining stream velocity (Current Meter, ADV)	code
+meas_q_va	Measured discharge value	cubic feet per second
+chan_stability_cd	Code identifying the stability of the channel (firm, soft)	code
+chan_mat_cd	Code identifying the material of the channel (sand, gravel, silt)	code
+vel_dstrb_cd	Code that describes velocity flow distribution within the cross-section over time; that is, whether the velocity distribution of flow within the cross-section is mostly steady or pulsating	code
+vert_vel_dstrb_cd	Code describes the vertical velocity distribution within the cross-section; that is, whether the vertical distribution of velocity within the cross-section is mostly uniform, standard profile, or non-standard profile	code
+q1_Percent_va	Round((([meas_q_va]/[q_va]) x 100),2)	percent 
+q1_Outside5Percent	[q1_Percent_va] greater than 105 Or [q1_Percent_va] less than 95	-1 indicates a + or - 5 percent exceedance
+q2_xsecond_area_X_mean_vel_va	Round(([xsecond_area_va] x [mean_vel_va]),2)	cubic feet per second
+q2_Percent_q_va	Round((([q2_xsecond_area_X_mean_vel_va]/[q_va]) x 100),2)	 percent 
+q2_q_va_OutsideBounds	[q2_Percent_q_va] greater than 105 Or [q2_Percent_q_va] less than 95	-1 indicates a + or - 5 percent exceedance
+q2_Percent_meas_q_va	Round((([q2_xsecond_area_X_mean_vel_va]/[meas_q_va]) x 100),2)	percent 
+q2_meas_q_va_OutsideBounds	[q2_Percent_meas_q_va] greater than 105 Or [q2_Percent_meas_q_va] less than 95	-1 indicates a + or - 5 percent exceedance
+q3_CalcQ	Round(([mean_depth_va] x [stream_wdth_va] x [mean_vel_va]),2)	cubic feet per second
+q3_PercentCalcQ_q_va	Round((([q3_CalcQ]/[q_va]) x 100),2)	percent 
+q3_q_va_OutsideBounds	[q3_PercentCalcQ_q_va] greater than 105 Or [q3_PercentCalcQ_q_va] less than 95	-1 indicates a + or - 5 percent exceedance
+q3_PercentCalcQ_meas_q_va	Round((([q3_CalcQ]/[meas_q_va]) x 100),2)	percent 
+q3_meas_q_va_OutsideBounds	[q3_PercentCalcQ_meas_q_va] greater than 105 Or [q3_PercentCalcQ_meas_q_va] less than 95	-1 indicates a + or - 5 percent exceedance
+q4_xsecond_area_D_stream_width	Round(([xsecond_area_va]/[stream_wdth_va]),2)	feet
+q4_Percent_xsecond_area_D_stream_width	Round((([q4_xsecond_area_D_stream_width]/[mean_depth_va]) x 100),2)	 percent 
+q4_OutsideBounds	[q4_Percent_xsecond_area_D_stream_width] greater than 105 Or [q4_Percent_xsecond_area_D_stream_width] less than 95	-1 indicates a + or - 5 percent exceedance
+q5_Mean_GT_Max	[max_depth_va]-[mean_depth_va] less than 0	-1 indicates mean depth greater than max depth
+q6_mean_vel_GT_max_vel	[max_vel_va]-[mean_vel_va] less than 0	-1 indicates mean velocity greater than max velocity
+q6_JRatio	Round(([mean_vel_va]/[max_vel_va]),3)	dimensionless
+q6_JRatioGTo58	[q6_JRatio] greater than 0.582	-1 indicates q6_JRatio greater than 0.582
+q6_JRatioLTo82	[q6_JRatio] less than 0.836	-1 indicates q6_JRatio less than 0.836
+q7_max_vel_D_mean_vel	Round(([max_vel_va]/[mean_vel_va]),2)	dimensionless
+q7_max_vel_D_mean_vel_LT2	Round(([max_vel_va]/[mean_vel_va]),2) less than 2	-1 indicates that the ratio of max to mean velocity is less than 2
+q8_stream_width_D_mean_depth	Round(([stream_wdth_va]/[mean_depth_va]),2)	dimensionless
+q8_GT2	Round(([stream_wdth_va]/[mean_depth_va]),2) greater than 2	-1 indicates that the ratio of stream width to mean depth is greater than 2
+q8_LT200	Round(([stream_wdth_va]/[mean_depth_va]),2) less than 200	-1 indicates that the ratio of stream width to mean depth is less than 200
+q9_stream_width_GT100	([stream_wdth_va]-100) greater than 0	-1 indicates stream width is greater than 100
+q10_mean_vel_GTo5	[mean_vel_va] greater than 0.5	-1 indicates mean velocity is greater than 0.5
