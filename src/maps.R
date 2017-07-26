@@ -6,9 +6,9 @@
 # Where do these come from?
 
 blocs <- hswot %>% 
-  transmute(lat = dec_lat_va,
-            lon = dec_long_va,
-            xs = site_no) %>% 
+  # transmute(lat = dec_lat_va,
+  #           lon = dec_long_va,
+  #           xs = site_no) %>% 
   unique() %>% 
   left_join(bhats, by = "xs") %>% 
   filter(!is.na(n))
