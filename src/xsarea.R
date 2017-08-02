@@ -73,6 +73,9 @@ foo <- xsdat %>% glimpse() %>%
 plot(median ~ mean, foo)
 abline(0, 1)
 
+hist(foo$n)
+quantile(foo$n, 0:10 / 10)
+
 foo %>% 
   filter(n > 50) %>%
   ggplot(aes(x = (median - mean) / mean)) +
