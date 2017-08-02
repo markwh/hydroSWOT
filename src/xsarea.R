@@ -59,3 +59,22 @@ plothw(2237700)
 # doesn't look like dh/dw tells us anything.
 
 
+# Checking distribution of logA -- does median equal mean? ----------------
+
+foo <- xsdat %>% glimpse() %>% 
+  group_by(xs) %>% 
+  mutate(n = n(), logA = log(area_m2)) %>% 
+  filter(n > 20) %>% glimpse() %>% 
+  group_by(xs) %>% 
+  summarize(min = min(logA), median = median(logA), 
+            mean = mean(logA), n = n())
+  
+
+plot(median ~ mean, foo)
+abline(0, 1)
+
+foo %>% 
+  filter(n > 50) %>%
+  ggplot(aes(x = (median - mean) / mean)) +
+  geom_histogram() +
+  xlim(-.5, 0.5)
