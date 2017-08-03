@@ -72,12 +72,17 @@ bpreddat <- bhats %>%
   ungroup() %>% 
   dplyr::select(xs, bhat) %>% 
   inner_join(aodat_nobad, by = "xs") %>% 
-  dplyr::select(bhat, lwbar:ha75, -lAo, n)
+  dplyr::select(bhat, lwbar:ha75, -lAo, n) %>% 
+  mutate(invb = 1 / bhat)
 pairs(bpreddat)
 summary(bpreddat)
 cache("bpreddat")
 
 # Yes! lwsd. 
+plot(invb ~ lwsd, bpreddat, 
+     # ylim = c(0, 20), xlim = c(0.25, 1.6))
+     ylim = c(0, 40), xlim = c(0, 1.6))
+abline(v = 0.2)
 
 blm1 <- lm(bhat ~ lwsd, bpreddat)
 summary(blm1)
@@ -98,3 +103,7 @@ par(mfrow = c(1, 2))
 visreg::visreg(blm2)
 par(op)
 dev.off()
+
+# How do residuals behave with respect to invb?
+
+
