@@ -65,9 +65,6 @@ pairs(wsddat)
 
 plot(sdLogW.r ~ lwsd, wsddat, log = "xy")
 abline(0, 1)
-# so model sdlLogW.r as function of lwsd
-
-wlm1 <- lm(lwsd)
 
 # is b affected by things we can measure?
 
@@ -92,6 +89,7 @@ gcv(blm2)
 AIC(blm2)
 
 blm <- blm1
+blm$data <- bpreddat
 cache("blm")
 
 png(filename = "b_fit.png", width = 600, height = 300)
