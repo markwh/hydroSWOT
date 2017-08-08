@@ -42,6 +42,8 @@ xsdat <- hswot %>%
   tbl_df() %>% 
   group_by(xs) %>% 
   mutate(Ao = min(area_m2),
+         Amed = median(area_m2),
+         Abar = mean(area_m2),
          dA = area_m2 - Ao, 
          n = n()) %>% 
   ungroup()
@@ -55,6 +57,8 @@ aodat <- xsdat %>%
             sdabar = mean(sqrt(dA)),
             sdasd = sd(sqrt(dA)),
             lAo = log(Ao[1]),
+            logAmed = log(Amed[1]),
+            logAbar = log(Abar[1]),
             ha25 = dHdW(h_m, W = w_m, lwr_p = 0, upr_p = 0.25),
             ha50 = dHdW(h_m, W = w_m, lwr_p = .25, upr_p = .50),
             ha75 = dHdW(h_m, W = w_m, lwr_p = .5, upr_p = .75),

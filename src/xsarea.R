@@ -70,14 +70,40 @@ foo <- xsdat %>% glimpse() %>%
             mean = mean(logA), n = n())
   
 
-plot(median ~ mean, foo)
+# png(filename = "graphs/area_mean_median.png", width = 4, height = 3, 
+#     units = "in", res = 100)
+plot(mean ~ median, foo, xlab = "median log-cross-sectional area",
+     ylab = "mean log-cross-sectional area")
 abline(0, 1)
+# dev.off()
 
 hist(foo$n)
 quantile(foo$n, 0:10 / 10)
+
 
 foo %>% 
   filter(n > 50) %>%
   ggplot(aes(x = (median - mean) / mean)) +
   geom_histogram() +
-  xlim(-.5, 0.5)
+  xlim(-.25, 0.25) + 
+  theme_bw()
+ggsave("graphs/area_relative_difference_mean_median.png", 
+       width = 4, height = 3)
+
+
+
+# Models for A0 as median -------------------------------------------------
+
+
+# model lAo ~ lwbar + lwsd
+alm3 <- lm(logAmed ~ lwbar + lwsd, data = aodat)
+summary(alm3)
+AIC(alm3)
+BIC(alm3)
+alm4 <- lm(logAmed ~ lwbar, data = aodat)
+summary(alm4)
+AIC(alm4)
+BIC(alm4)
+
+amedlm <- alm3
+cache("amedlm")
