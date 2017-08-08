@@ -18,4 +18,6 @@ slopes <- read.dbf("data/elevslope.dbf") %>%
             slope = slope)
 
 
+flowline <- read.dbf("data/NHDPlusMS/NHDPlus07/NHDPlusAttributes/PlusFlowAR.dbf")
+
 str(slopes, 1)

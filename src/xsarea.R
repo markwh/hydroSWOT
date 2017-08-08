@@ -28,6 +28,7 @@ AIC(alm2)
 ## Save model 
 
 alm <- alm1
+alm$data <- aodat
 cache("alm")
 
 ## Save plot
